@@ -69,3 +69,8 @@ La ejecución local 23 procesó el documento sintético SOP-004 mediante el webh
 ```
 
 La llamada produjo HTTP 200 y el historial de n8n mostró éxito; el servidor y la tabla son locales. Se mantienen pendientes la sanitización del documento previo al envío a IA, la instrumentación de tokens y costos y las demás medidas de producción.
+
+
+### Error controlado de la versión actual
+
+El webhook local recibió un PDF sintético corrupto en la ejecución 24. El historial mostró ejecución completa y el nodo de normalización produjo `estado: revision`, `revision_humana: true` y `error: Respuesta invalida`. El HTTP 200 es solo confirmación de recepción; la ejecución y su salida se verificaron por separado en n8n.
