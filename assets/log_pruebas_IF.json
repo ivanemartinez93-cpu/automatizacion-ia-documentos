@@ -1,0 +1,42 @@
+{
+  "fecha": "2026-11-11",
+  "origen": "Historial local de n8n; datos sinteticos",
+  "pruebas": [
+    {
+      "ejecucion": 25,
+      "caso": "PDF valido, proveedor limita solicitudes",
+      "IF": "false",
+      "persistido": true,
+      "observacion": "Respuesta invalida y revision humana"
+    },
+    {
+      "ejecucion": 26,
+      "caso": "Prueba aislada n8n con respuesta sintetica del modelo",
+      "IF": [
+        "true",
+        "false"
+      ],
+      "salida_valida": {
+        "fecha": "2024-01-20",
+        "importe": 1234.56,
+        "categorias": [
+          "facturacion"
+        ],
+        "prioridad": "media",
+        "valido": true,
+        "revision_humana": true
+      },
+      "salida_error": {
+        "valido": false,
+        "revision_humana": true
+      }
+    },
+    {
+      "ejecucion": 27,
+      "caso": "PDF sintetico SOP-004 por webhook publicado",
+      "IF": "true",
+      "persistido": true,
+      "fallo_decisor": "Limite de solicitudes Gemini"
+    }
+  ]
+}
