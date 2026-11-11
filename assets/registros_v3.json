@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2026-11-11T21:25:01.323Z",
+    "transaction_id": "61410098-f697-4569-8b46-f6ffc2e7aadd",
+    "agent_name": "decisor",
+    "input_tokens": null,
+    "output_tokens": null,
+    "estimated_cost": null,
+    "cost_status": "sin_datos_de_uso",
+    "thinking_tokens": 0,
+    "status": "Skipped",
+    "latency_total_ms": 18,
+    "revision_humana": true,
+    "alerta": true,
+    "accion_operativa": "Revisar ejecución y cuota del proveedor; no ejecutar acciones externas",
+    "ejecucion": "30",
+    "estado_validacion": false
+  },
+  {
+    "timestamp": "2026-11-11T21:25:01.323Z",
+    "transaction_id": "61410098-f697-4569-8b46-f6ffc2e7aadd",
+    "agent_name": "analista",
+    "input_tokens": null,
+    "output_tokens": null,
+    "estimated_cost": null,
+    "cost_status": "sin_datos_de_uso",
+    "thinking_tokens": 0,
+    "status": "Skipped",
+    "latency_total_ms": 18,
+    "revision_humana": true,
+    "alerta": true,
+    "accion_operativa": "Revisar ejecución y cuota del proveedor; no ejecutar acciones externas",
+    "ejecucion": "30",
+    "estado_validacion": false
+  }
+]
