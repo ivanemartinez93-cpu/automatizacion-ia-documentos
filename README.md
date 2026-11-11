@@ -74,3 +74,20 @@ La llamada produjo HTTP 200 y el historial de n8n mostró éxito; el servidor y 
 ### Error controlado de la versión actual
 
 El webhook local recibió un PDF sintético corrupto en la ejecución 24. El historial mostró ejecución completa y el nodo de normalización produjo `estado: revision`, `revision_humana: true` y `error: Respuesta invalida`. El HTTP 200 es solo confirmación de recepción; la ejecución y su salida se verificaron por separado en n8n.
+
+
+## Correspondencia con el esquema del módulo 1
+
+El plan inicial definió `id`, `categoria`, `prioridad`, `evidencia` y `revision`. La implementación actual los relaciona así; las diferencias son pendientes, no conversiones ya implementadas:
+
+| Origen del documento | Esquema inicial | Salida actual | Diferencia o control |
+| --- | --- | --- | --- |
+| Identificador del ticket | `id` | `ticket_id` | Cambio de nombre. |
+| Motivos o temas | `categoria` | `categorias` | El plan prevé un valor enumerado; el flujo devuelve una lista y todavía no aplica el mismo vocabulario. |
+| Prioridad textual | `prioridad` | `prioridad` | El plan usa alta/normal/revisar; el modelo puede devolver otros valores. Requiere revisión humana. |
+| Pasaje que respalda la clasificación | `evidencia` | No implementado | Falta extraer y comprobar una referencia al documento. |
+| Necesidad de revisión | `revision` | `revision_humana` | Actualmente siempre verdadero por control conservador. |
+| Fecha del documento | No contemplado | `fecha` | Campo añadido en el prototipo y normalizado como AAAA-MM-DD si es válido. |
+| Monto del documento | No contemplado | `importe` | Campo añadido; número normalizado o null si falta/no es reconocible. |
+
+La validación por rama IF solicitada por Ticher está en preparación. El archivo publicado representa la versión ejecutada anterior; no se presenta la propuesta como implementación probada.
