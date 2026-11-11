@@ -58,3 +58,14 @@ La normalización se verificó con cuatro pruebas locales de código (fecha text
 Para importar el export sanitizado, crear la credencial Gemini en n8n, reasignar ambos nodos, crear la tabla y seleccionarla en Insert row. El path del webhook fue reemplazado por un marcador para que cada entorno lo configure; activar y probar en ese entorno. El export se distribuye inactivo y sin datos fijados ni credenciales.
 
 Pendiente: sanitización efectiva de PDF antes de enviarlo a IA, UUID por transacción, métricas de tokens/costo por agente, alertas, prueba de errores y almacenamiento bajo la nueva versión, y despliegue seguro. El sistema es un prototipo; las dos llamadas al modelo no acreditan agentes autónomos ni preparación productiva. La captura anterior corresponde a la versión con formulario.
+
+
+### Prueba completa con normalización
+
+La ejecución local 23 procesó el documento sintético SOP-004 mediante el webhook publicado: la fecha `20 de enero de 2024` se transformó en `2024-01-20`, el importe `$ 1.234,56` en `1234.56` y el resultado quedó en revisión humana. Salida observada del nodo de normalización:
+
+```json
+{"ticket_id":"SOP-004","fecha":"2024-01-20","categorias":["facturacion"],"prioridad":"media","importe":1234.56,"revision_humana":true,"estado":"revision"}
+```
+
+La llamada produjo HTTP 200 y el historial de n8n mostró éxito; el servidor y la tabla son locales. Se mantienen pendientes la sanitización del documento previo al envío a IA, la instrumentación de tokens y costos y las demás medidas de producción.
