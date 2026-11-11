@@ -27,3 +27,23 @@ Las capturas documentan el prototipo local. Las pruebas usaron PDF sintéticos: 
 | Fallo simulado del segundo modelo | Ejecución 14: se registró `fallo_decisor=true` y `ruta_control=revision_humana`; luego se restauró el modelo. |
 
 Las pruebas son locales y no demuestran precisión general, notificaciones, agentes autónomos ni preparación para producción. El flujo incluye dos llamadas a modelos con roles distintos; no implementa agentes autónomos que usan herramientas. El acceso web de entrada, normalización robusta de fechas, costes por ejecución, alertas y prueba de fallo del almacenamiento siguen pendientes.
+
+## Ejemplo de resultado observado
+
+Registro de la ejecución local 8 con el documento sintético SOP-001 (se omite el texto de la propuesta en este extracto):
+
+```json
+{
+  "extraccion": {
+    "ticket_id": "SOP-001",
+    "fecha": "2026-11-11",
+    "categorias": ["Facturación", "Acceso a la cuenta"],
+    "prioridad": null,
+    "revision_humana": true,
+    "estado": "revision"
+  },
+  "ejecucion": "8"
+}
+```
+
+El JSON exportado se encuentra también en `workflow/flujo.json`; las capturas revisadas están en `assets/`. El ejemplo es un extracto real del registro local, no una prueba de webhook ni de normalización.
