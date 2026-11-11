@@ -91,3 +91,12 @@ El plan inicial definió `id`, `categoria`, `prioridad`, `evidencia` y `revision
 | Monto del documento | No contemplado | `importe` | Campo añadido; número normalizado o null si falta/no es reconocible. |
 
 La validación por rama IF solicitada por Ticher está en preparación. El archivo publicado representa la versión ejecutada anterior; no se presenta la propuesta como implementación probada.
+
+
+## Versión IF probada el 11/11/2026
+
+El export actual incorpora `Validacion de campos` (IF) sobre `$json.valido`. Su rama verdadera llama al decisor; la falsa deriva directamente al registro de revisión. El validador expone un booleano, normaliza categorías con trim y minúsculas, y limpia la prioridad del mismo modo. La revisión humana permanece obligatoria incluso para datos estructuralmente válidos.
+
+Se importó y publicó mediante la CLI oficial de n8n. La ejecución 25 verificó la rama falsa y persistencia ante límite del proveedor; la ejecución 26 probó ambas ramas de forma aislada con respuestas sintéticas; la ejecución 27 usó el PDF SOP-004 en el webhook publicado, tomó la rama verdadera y persistió el fallo del decisor por límite de solicitudes Gemini. El estado exitoso del workflow significa que terminó con su manejo de errores, no que las llamadas de IA fueron todas exitosas. Ver `assets/log_pruebas_IF.json`.
+
+El export conserva el path local real del webhook y active=true, coincidente con el despliegue local observado. No incluye credenciales ni el identificador local de tabla: deben configurarse al importar. Las capturas previas son históricas y todavía falta una captura del historial de esta versión.
