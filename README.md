@@ -47,3 +47,14 @@ Registro de la ejecución local 8 con el documento sintético SOP-001 (se omite 
 ```
 
 El JSON exportado se encuentra también en `workflow/flujo.json`; las capturas revisadas están en `assets/`. El ejemplo es un extracto real del registro local, no una prueba de webhook ni de normalización.
+
+
+## Actualización del 11/11/2026: webhook y normalización
+
+El export actualizado está en `workflow/flujo.json` y en la raíz. Se añadieron un webhook POST local, un selector para el binario `documento`/`documento0` y normalización de fechas e importes. El webhook de prueba recibió un PDF sintético; la ejecución completa 21 finalizó correctamente, y la ejecución 22 del webhook publicado localmente finalizó correctamente. La respuesta HTTP 200 indica aceptación, no garantiza por sí sola que los nodos posteriores hayan terminado; el historial confirmó el resultado de la ejecución 22.
+
+La normalización se verificó con cuatro pruebas locales de código (fecha textual, fecha numérica, fecha inválida e importe ambiguo) y con la salida de Gemini en n8n. Todo resultado se envía a revisión humana porque se observó que el modelo puede inventar prioridad. Estos casos no demuestran precisión general. El webhook corre únicamente en el servidor local y no cuenta con autenticación; no usarlo con datos reales ni exponerlo a internet.
+
+Para importar el export sanitizado, crear la credencial Gemini en n8n, reasignar ambos nodos, crear la tabla y seleccionarla en Insert row. El path del webhook fue reemplazado por un marcador para que cada entorno lo configure; activar y probar en ese entorno. El export se distribuye inactivo y sin datos fijados ni credenciales.
+
+Pendiente: sanitización efectiva de PDF antes de enviarlo a IA, UUID por transacción, métricas de tokens/costo por agente, alertas, prueba de errores y almacenamiento bajo la nueva versión, y despliegue seguro. El sistema es un prototipo; las dos llamadas al modelo no acreditan agentes autónomos ni preparación productiva. La captura anterior corresponde a la versión con formulario.
