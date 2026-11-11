@@ -1,19 +1,24 @@
-# Arquitectura actual del prototipo
+# Arquitectura del prototipo local
 
-Formulario local → Gemini: análisis de PDF sintético → código de validación → Gemini: propuesta de ruta → tabla de datos local n8n.
+Webhook POST/formulario → análisis Gemini → normalización y validación → IF.
 
-- Los dos pasos de modelo son llamadas con roles diferenciados; no se han probado agentes autónomos con herramientas.
-- Las credenciales se almacenan en n8n, fuera del JSON publicado.
-- Se probó un PDF corrupto y un fallo simulado del segundo modelo con envío a revisión humana.
-- Se observó un nodo webhook en el editor, pero su persistencia y funcionamiento no se han verificado. El export publicado corresponde a la versión anterior.
-- Antes de usar datos reales falta sanitización fiable previa al proveedor, protección de documentos, pruebas de fallos y almacenamiento, observabilidad por agente y acceso seguro. No es un despliegue productivo.
+- Si `valido=true`: propuesta de ruta Gemini → persistencia.
+- Si `valido=false`: persistencia directa del caso para revisión.
+- El control `revision_humana=true` es obligatorio en ambas rutas; que el dato cumpla el formato no verifica su fidelidad.
+- El export se obtuvo con la CLI oficial de n8n. Las credenciales y el ID de la tabla se retiran de la copia pública y se reasignan al importar.
 
-## Incidente: falla del segundo modelo
+## Evidencia
 
-1. Mantener el caso pendiente de revisión humana; no convertir una propuesta del modelo en una acción automática.
-2. Consultar la ejecución y el registro de la tabla; comprobar el estado del proveedor y las credenciales desde n8n sin revelar claves.
-3. Corregir la causa en un entorno de prueba y repetir con un documento sintético; comprobar el registro antes de reanudar.
+Ejecución 25: Gemini limitó solicitudes, IF falso y registro de revisión. Ejecución 26: prueba aislada de n8n con respuestas sintéticas, ambas ramas correctas. Ejecución 27: extracción real de PDF sintético, IF verdadero y registro del fallo del decisor por límite del proveedor. El estado de ejecución final significa que el flujo terminó con manejo de errores; no acredita que ambos modelos respondieran correctamente.
 
-## Métricas pendientes
+## Runbook de incidentes
 
-El prototipo guarda identificador de ejecución y resultado; aún no implementa UUID de transacción, tokens ni costo por agente. No inferir costos o éxito a partir de datos no registrados.
+1. Suspender decisiones automáticas; mantener el registro para revisión humana.
+2. Buscar la ejecución y comprobar `fallo_decisor`, `ruta_control` y el error sin copiar claves ni el contenido privado del documento.
+3. Si hay límite de solicitudes, revisar la cuota del proveedor y esperar el intervalo indicado. No repetir envíos en bucle ni cambiar a servicios pagos sin autorización.
+4. Si hay un documento inválido, corregir el origen y repetir con un PDF de prueba. Si falla almacenamiento, no confirmar persistencia hasta verificar el registro.
+5. Después de corregir, ejecutar un caso válido y uno inválido y comprobar rama, destino y estado.
+
+## Configuración y límites pendientes
+
+El webhook publicado es local y carece de autenticación; usar solo datos ficticios. Aún faltan sanitización de PDF antes de la primera API, UUID común y métricas por agente, costos y alertas. No es un despliegue productivo ni una implementación validada de agentes autónomos.
