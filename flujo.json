@@ -1,0 +1,187 @@
+{
+  "name": "Curso IA - extraccion documental prototipo",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Prueba local de documentos ficticios",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "documento",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c56d1b2c-2590-49a8-95b8-c3bdd5422f87",
+      "name": "On form submission"
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "Gemini 3 Flash Preview"
+        },
+        "text": "Analiza exclusivamente el documento ficticio. Extrae JSON con ticket_id, fecha (AAAA-MM-DD), categorias (lista), prioridad y revision_humana (booleano). Si falta un campo usa null y activa revision_humana. No inventes datos.",
+        "inputType": "binary",
+        "binaryPropertyName": "documento",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ceb89ad7-36e7-40c5-9c15-a0a53d513a5c",
+      "name": "Analyze document",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  try {\n    const raw = item.json.content?.parts?.[0]?.text ?? '';\n    const p = JSON.parse(raw.trim().replace(/^```(?:json)?\\s*/i,'').replace(/\\s*```$/,''));\n    const fecha = typeof p.fecha === 'string' && /^\\d{4}-\\d{2}-\\d{2}$/.test(p.fecha) ? p.fecha : null;\n    const valido = typeof p.ticket_id === 'string' && p.ticket_id.trim().length > 0 && fecha && Array.isArray(p.categorias) && p.categorias.length > 0 && typeof p.revision_humana === 'boolean';\n    const revision = !valido || p.prioridad == null || p.revision_humana === true;\n    return {json:{ticket_id:p.ticket_id ?? null,fecha,categorias:Array.isArray(p.categorias)?p.categorias:[],prioridad:p.prioridad ?? null,revision_humana:revision,estado:revision?'revision':'procesado'}};\n  } catch(e) { return {json:{estado:'revision',revision_humana:true,error:'Respuesta invalida'}}; }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        16
+      ],
+      "id": "0768c061-7a11-4e83-813c-49a1df67ae13",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-flash-preview",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "==Eres un asistente decisor de triaje. Con estos datos ficticios: {{ JSON.stringify($json) }}. Propone únicamente una ruta (revision_humana o soporte), sin ejecutar acciones; si revision_humana es true, debe ser revision_humana. Devuelve JSON con ruta y motivo."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        16
+      ],
+      "id": "d8cd21d8-8987-4a60-83dc-f82266b48521",
+      "name": "Message a model",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "resultado": "={{ JSON.stringify({extraccion: $(\"Code in JavaScript\").item.json, propuesta: $json.content?.parts?.[0]?.text ?? null, fallo_decisor: Boolean($json.error), ruta_control: ($json.error || $(\"Code in JavaScript\").item.json.revision_humana) ? \"revision_humana\" : \"revision_requerida\", ejecucion: $execution.id}) }}"
+          },
+          "matchingColumns": [
+            "resultado"
+          ],
+          "schema": [
+            {
+              "id": "resultado",
+              "displayName": "resultado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        16
+      ],
+      "id": "825cc06a-f1b9-4629-8c77-539f0f0d4d03",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c7de57c8-4dee-4660-8f4f-a3bc37298644",
+  "nodeGroups": [],
+  "tags": []
+}
